@@ -14,6 +14,10 @@ type UserService struct {
 	repo UserServiceRepository
 }
 
+func NewUserService(repo UserServiceRepository) UserService {
+	return UserService{repo}
+}
+
 type UserCreateRequest struct {
 	Email string
 }

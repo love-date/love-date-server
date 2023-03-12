@@ -6,12 +6,16 @@ import (
 )
 
 type ProfileServiceRepository interface {
-	DoesThisUserProfileExist(profileID int) (bool, entity.Profile, error)
+	DoesThisUserProfileExist(userID int) (bool, entity.Profile, error)
 	CreateProfile(profile entity.Profile) (entity.Profile, error)
 	Update(profileID int, profile entity.Profile) (entity.Profile, error)
 }
 type ProfileService struct {
 	repo ProfileServiceRepository
+}
+
+func NewProfileService(repo ProfileServiceRepository) ProfileService {
+	return ProfileService{repo}
 }
 
 type CreateProfileRequest struct {
@@ -78,7 +82,11 @@ func (p ProfileService) Update(req UpdateProfileRequest) (UpdateProfileResponse,
 	//	return UpdateProfileResponse{}, fmt.Errorf("this user doesn't have permission to update this profile")
 	//}
 
-	if updatedProfile, uErr := p.repo.Update(req.AuthenticatedUserID, profile); uErr != nil {
+	if updatedProfile, uErr := p.repo.Update(profile.ID, entity.Profile{
+		Name:                    req.Name,
+		BirthdayNotifyActive:    req.BirthdayNotifyActive,
+		SpecialDaysNotifyActive: req.SpecialDaysNotifyActive,
+	}); uErr != nil {
 
 		return UpdateProfileResponse{}, fmt.Errorf("unexpected error : %w", uErr)
 	} else {

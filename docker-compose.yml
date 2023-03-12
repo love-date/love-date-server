@@ -1,0 +1,20 @@
+version: '3.7'
+
+services:
+  loveapp-database:
+    image: mysql:8.0
+    ports:
+      - "3308:3306"
+    container_name: loveapp-database
+    volumes:
+      - dbdata:/var/lib/mysql
+    restart: always
+    command: ['mysqld', '--character-set-server=utf8mb4', '--collation-server=utf8mb4_unicode_ci']
+    environment:
+      MYSQL_ROOT_PASSWORD: loveappRoo7t0lk2o20
+      MYSQL_DATABASE: loveapp-db
+      MYSQL_USER: loveapptest
+      MYSQL_PASSWORD: loveapptest123
+
+volumes:
+  dbdata:
