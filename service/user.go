@@ -11,11 +11,18 @@ type UserServiceRepository interface {
 }
 
 type UserService struct {
-	repo UserServiceRepository
+	repo           UserServiceRepository
+	partnerService PartnerService
+	profileService ProfileService
 }
 
-func NewUserService(repo UserServiceRepository) UserService {
-	return UserService{repo}
+func NewUserService(repo UserServiceRepository, partnerService PartnerService,
+	profileService ProfileService) UserService {
+	return UserService{
+		repo,
+		partnerService,
+		profileService,
+	}
 }
 
 type UserCreateRequest struct {
@@ -46,4 +53,30 @@ func (u UserService) Create(req UserCreateRequest) (UserCreateResponse, error) {
 		return UserCreateResponse{createdUser}, nil
 	}
 
+}
+
+type AppendPartnerNameRequest struct {
+	AuthenticatedUserID int
+}
+
+type AppendPartnerNameResponse struct {
+	AppendNames string
+}
+
+func (u UserService) AppendNames(req AppendPartnerNameRequest) (AppendPartnerNameResponse, error) {
+	profileResult, err := u.profileService.GetUserProfile(GetProfileRequest{req.AuthenticatedUserID})
+	if err != nil {
+
+		return AppendPartnerNameResponse{}, fmt.Errorf("can't get profile : %w", err)
+	}
+
+	partnerResult, err := u.partnerService.GetUserActivePartner(GetUserActivePartnerRequest{req.AuthenticatedUserID})
+	if err != nil {
+
+		return AppendPartnerNameResponse{}, fmt.Errorf("can't get partner : %w", err)
+	}
+
+	appendName := fmt.Sprintf("%s %s", profileResult.Profile.Name, partnerResult.Partner.Name)
+
+	return AppendPartnerNameResponse{appendName}, nil
 }

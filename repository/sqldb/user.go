@@ -34,3 +34,23 @@ func (d *MySQLDB) DoesThisUserEmailExist(email string) (bool, entity.User, error
 
 	return true, user, nil
 }
+
+//func (p Partner) AppendNames(req AppendPartnerNameRequest) (AppendPartnerNameResponse, error) {
+//	partnerExist, partner, err := p.repo.DoesUserHaveActivePartner(req.AuthenticatedUserID)
+//	if err != nil {
+//
+//		return AppendPartnerNameResponse{}, fmt.Errorf("unexpected error : %w", err)
+//	}
+//	if !partnerExist {
+//
+//		return AppendPartnerNameResponse{}, fmt.Errorf("this user hasn't any active partner")
+//	}
+//
+//	if appendNames, aErr := p.repo.AppendNameWithPartner(partner.ID); aErr != nil {
+//
+//		return AppendPartnerNameResponse{}, fmt.Errorf("unexpected error : %w", err)
+//	} else {
+//
+//		return AppendPartnerNameResponse{appendNames}, nil
+//	}
+//}

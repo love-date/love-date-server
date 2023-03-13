@@ -95,24 +95,24 @@ func (p ProfileService) Update(req UpdateProfileRequest) (UpdateProfileResponse,
 	}
 }
 
-type GetProfileByIDRequest struct {
+type GetProfileRequest struct {
 	AuthenticatedUserID int
 }
 
-type GetProfileByIDResponse struct {
+type GetProfileResponse struct {
 	Profile entity.Profile
 }
 
-func (p ProfileService) GetUserProfileByID(req GetProfileByIDRequest) (GetProfileByIDResponse, error) {
+func (p ProfileService) GetUserProfile(req GetProfileRequest) (GetProfileResponse, error) {
 	profileExist, profile, err := p.repo.DoesThisUserProfileExist(req.AuthenticatedUserID)
 	if err != nil {
 
-		return GetProfileByIDResponse{}, fmt.Errorf("unexpected error: %w", err)
+		return GetProfileResponse{}, fmt.Errorf("unexpected error: %w", err)
 	}
 	if !profileExist {
 
-		return GetProfileByIDResponse{}, fmt.Errorf("the profile not found")
+		return GetProfileResponse{}, fmt.Errorf("the profile not found")
 	}
 
-	return GetProfileByIDResponse{profile}, nil
+	return GetProfileResponse{profile}, nil
 }

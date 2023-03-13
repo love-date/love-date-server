@@ -10,10 +10,14 @@ type PartnerServiceRepository interface {
 	CreatePartner(partner entity.Partner) (entity.Partner, error)
 	UpdatePartner(partnerID int, partner entity.Partner) (entity.Partner, error)
 	DoesUserHaveActivePartner(userID int) (bool, entity.Partner, error)
-	AppendNameWithPartner(userID int) (string, error)
 }
-type Partner struct {
+type PartnerService struct {
 	repo PartnerServiceRepository
+}
+
+func NewPartnerService(repo PartnerServiceRepository) PartnerService {
+
+	return PartnerService{repo}
 }
 
 type CreatePartnerRequest struct {
@@ -27,7 +31,7 @@ type CreatePartnerResponse struct {
 	Partner entity.Partner
 }
 
-func (p Partner) Create(req CreatePartnerRequest) (CreatePartnerResponse, error) {
+func (p PartnerService) Create(req CreatePartnerRequest) (CreatePartnerResponse, error) {
 	partnerExist, _, err := p.repo.DoesUserHaveActivePartner(req.AuthenticatedUserID)
 	if err != nil {
 
@@ -54,7 +58,6 @@ func (p Partner) Create(req CreatePartnerRequest) (CreatePartnerResponse, error)
 
 type UpdatePartnerRequest struct {
 	AuthenticatedUserID int
-	ProfileID           int
 	Name                string
 	Birthday            time.Time
 	FirstDate           time.Time
@@ -64,7 +67,7 @@ type UpdatePartnerResponse struct {
 	Partner entity.Partner
 }
 
-func (p Partner) Update(req UpdatePartnerRequest) (UpdatePartnerResponse, error) {
+func (p PartnerService) Update(req UpdatePartnerRequest) (UpdatePartnerResponse, error) {
 	partnerExist, partner, err := p.repo.DoesUserHaveActivePartner(req.AuthenticatedUserID)
 	if err != nil {
 
@@ -102,7 +105,7 @@ type RemovePartnerResponse struct {
 	Partner entity.Partner
 }
 
-func (p Partner) Remove(req RemovePartnerRequest) (RemovePartnerResponse, error) {
+func (p PartnerService) Remove(req RemovePartnerRequest) (RemovePartnerResponse, error) {
 	partnerExist, partner, err := p.repo.DoesUserHaveActivePartner(req.AuthenticatedUserID)
 	if err != nil {
 
@@ -138,7 +141,7 @@ type GetUserActivePartnerResponse struct {
 	Partner entity.Partner
 }
 
-func (p Partner) GetUserActivePartner(req GetUserActivePartnerRequest) (GetUserActivePartnerResponse, error) {
+func (p PartnerService) GetUserActivePartner(req GetUserActivePartnerRequest) (GetUserActivePartnerResponse, error) {
 	partnerExist, partner, err := p.repo.DoesUserHaveActivePartner(req.AuthenticatedUserID)
 	if err != nil {
 
@@ -150,34 +153,6 @@ func (p Partner) GetUserActivePartner(req GetUserActivePartnerRequest) (GetUserA
 	}
 
 	return GetUserActivePartnerResponse{partner}, err
-}
-
-type AppendPartnerNameRequest struct {
-	AuthenticatedUserID int
-}
-
-type AppendPartnerNameResponse struct {
-	AppendNames string
-}
-
-func (p Partner) AppendNames(req AppendPartnerNameRequest) (AppendPartnerNameResponse, error) {
-	partnerExist, _, err := p.repo.DoesUserHaveActivePartner(req.AuthenticatedUserID)
-	if err != nil {
-
-		return AppendPartnerNameResponse{}, fmt.Errorf("unexpected error : %w", err)
-	}
-	if !partnerExist {
-
-		return AppendPartnerNameResponse{}, fmt.Errorf("this user has't any active partner")
-	}
-
-	if appendNames, aErr := p.repo.AppendNameWithPartner(req.AuthenticatedUserID); aErr != nil {
-
-		return AppendPartnerNameResponse{}, fmt.Errorf("unexpected error : %w", err)
-	} else {
-
-		return AppendPartnerNameResponse{appendNames}, nil
-	}
 }
 
 // CalculateTimeHasBeenTogether TODO: List of how time has been together
