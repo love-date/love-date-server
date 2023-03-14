@@ -1,11 +1,11 @@
 package entity
 
 type Profile struct {
-	ID                      int
-	UserID                  int
-	Name                    string
-	BirthdayNotifyActive    bool
-	SpecialDaysNotifyActive bool
+	ID                      int    `json:"id"`
+	UserID                  int    `json:"user_id"`
+	Name                    string `json:"name"`
+	BirthdayNotifyActive    bool   `json:"birthday_notify_active"`
+	SpecialDaysNotifyActive bool   `json:"special_days_notify_active"`
 	vipActive               bool
 }
 

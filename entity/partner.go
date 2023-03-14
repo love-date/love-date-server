@@ -3,11 +3,11 @@ package entity
 import "time"
 
 type Partner struct {
-	ID        int
-	UserID    int
-	Name      string
-	Birthday  time.Time
-	FirstDate time.Time
+	ID        int       `json:"id"`
+	UserID    int       `json:"user_id"`
+	Name      string    `json:"name"`
+	Birthday  time.Time `json:"birthday"`
+	FirstDate time.Time `json:"first_date"`
 	isDeleted bool
 }
 

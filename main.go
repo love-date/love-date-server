@@ -7,6 +7,7 @@ import (
 )
 
 func main() {
+
 	repo := sqldb.New()
 	profileService := service.NewProfileService(repo)
 	partnerService := service.NewPartnerService(repo)
