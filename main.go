@@ -1,22 +1,22 @@
 package main
 
 import (
-	"fmt"
-	"love-date/repository/sqldb"
-	"love-date/service"
+	"love-date/delivery/httpsserver"
 )
 
 func main() {
 
-	repo := sqldb.New()
-	profileService := service.NewProfileService(repo)
-	partnerService := service.NewPartnerService(repo)
-	userService := service.NewUserService(repo, partnerService, profileService)
-	res, err := userService.AppendNames(service.AppendPartnerNameRequest{AuthenticatedUserID: 4})
-	if err != nil {
-		fmt.Println("error", err)
-	}
-	fmt.Println("user:", res.AppendNames)
+	server := httpsserver.NewHttpServer("", 1988)
+	server.Start()
+	//repo := sqldb.New()
+	//profileService := service.NewProfileService(repo)
+	//partnerService := service.NewPartnerService(repo)
+	//userService := service.NewUserService(repo, partnerService, profileService)
+	//res, err := userService.AppendNames(service.AppendPartnerNameRequest{AuthenticatedUserID: 4})
+	//if err != nil {
+	//	fmt.Println("error", err)
+	//}
+	//fmt.Println("user:", res.AppendNames)
 	//res, err := userService.Create(service.UserCreateRequest{Email: "masooodsk@gmail.com"})
 	//if err != nil {
 	//	fmt.Println("error", err)
@@ -64,4 +64,5 @@ func main() {
 	//	fmt.Println("error", err)
 	//}
 	//fmt.Println("profile:", res2)
+
 }

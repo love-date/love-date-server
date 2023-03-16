@@ -19,9 +19,9 @@ func NewProfileService(repo ProfileServiceRepository) ProfileService {
 }
 
 type CreateProfileRequest struct {
-	Name                    string
-	BirthdayNotifyActive    bool
-	SpecialDaysNotifyActive bool
+	Name                    string `json:"name"`
+	BirthdayNotifyActive    bool   `json:"birthday_notify_active"`
+	SpecialDaysNotifyActive bool   `json:"special_days_notify_active"`
 	AuthenticatedUserID     int
 }
 
@@ -56,9 +56,9 @@ func (p ProfileService) Create(req CreateProfileRequest) (CreateProfileResponse,
 }
 
 type UpdateProfileRequest struct {
-	Name                    string
-	BirthdayNotifyActive    bool
-	SpecialDaysNotifyActive bool
+	Name                    string `json:"name"`
+	BirthdayNotifyActive    bool   `json:"birthday_notify_active"`
+	SpecialDaysNotifyActive bool   `json:"special_days_notify_active"`
 	AuthenticatedUserID     int
 }
 

@@ -21,9 +21,9 @@ func NewPartnerService(repo PartnerServiceRepository) PartnerService {
 }
 
 type CreatePartnerRequest struct {
-	Name                string
-	Birthday            time.Time
-	FirstDate           time.Time
+	Name                string    `json:"name"`
+	Birthday            time.Time `json:"birthday"`
+	FirstDate           time.Time `json:"first_date"`
 	AuthenticatedUserID int
 }
 
@@ -32,6 +32,7 @@ type CreatePartnerResponse struct {
 }
 
 func (p PartnerService) Create(req CreatePartnerRequest) (CreatePartnerResponse, error) {
+	fmt.Println(req.AuthenticatedUserID)
 	partnerExist, _, err := p.repo.DoesUserHaveActivePartner(req.AuthenticatedUserID)
 	if err != nil {
 
@@ -58,9 +59,9 @@ func (p PartnerService) Create(req CreatePartnerRequest) (CreatePartnerResponse,
 
 type UpdatePartnerRequest struct {
 	AuthenticatedUserID int
-	Name                string
-	Birthday            time.Time
-	FirstDate           time.Time
+	Name                string    `json:"name"`
+	Birthday            time.Time `json:"birthday"`
+	FirstDate           time.Time `json:"first_date"`
 }
 
 type UpdatePartnerResponse struct {

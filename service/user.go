@@ -26,7 +26,7 @@ func NewUserService(repo UserServiceRepository, partnerService PartnerService,
 }
 
 type UserCreateRequest struct {
-	Email string
+	Email string `json:"email"`
 }
 type UserCreateResponse struct {
 	User entity.User
