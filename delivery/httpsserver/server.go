@@ -25,10 +25,21 @@ func (s *Server) Start() {
 	partnerService := service.NewPartnerService(repo)
 	profileHandler := handlre.NewProfileHandler(profileService)
 	partnerHandler := handlre.NewPartnerHandler(partnerService)
+
+	fmt.Printf("server is runing on %s:%d\n", s.host, s.port)
+
 	mux.Handle("/profile/create", http.HandlerFunc(profileHandler.CreateNewProfile))
-	mux.Handle("/profile", http.HandlerFunc(profileHandler.GetUserProfile))
+	fmt.Println(http.MethodPost + " /profile/create --> create profile route")
+
+	mux.Handle("/profile/", http.HandlerFunc(profileHandler.GetUserProfile))
+	fmt.Println(http.MethodGet + " /profile --> get user profile route")
+
 	mux.Handle("/partner/create", http.HandlerFunc(partnerHandler.CreateNewPartner))
+	fmt.Println(http.MethodPost + " /partner/create --> create partner route")
+
 	mux.Handle("/partner", http.HandlerFunc(partnerHandler.GetUserPartner))
+	fmt.Println(http.MethodGet + " /partner --> get user active partner route")
+
 	err := http.ListenAndServe(fmt.Sprintf(`%s:%d`, s.host, s.port), mux)
 	if err != nil {
 
