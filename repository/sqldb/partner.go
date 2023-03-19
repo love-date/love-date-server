@@ -18,15 +18,29 @@ func (d *MySQLDB) CreatePartner(partner entity.Partner) (entity.Partner, error) 
 
 	return partner, nil
 }
+
 func (d *MySQLDB) UpdatePartner(partnerID int, partner entity.Partner) (entity.Partner, error) {
-	_, err := d.db.Exec(`update  partners set name=? ,birthday=? ,first_date=? where id=?`,
-		partner.Name, partner.Birthday, partner.FirstDate, partnerID)
+	_, err := d.db.Exec(`update  partners set name=? ,birthday=? ,first_date=?,is_deleted=? where id=?`,
+		partner.Name, partner.Birthday, partner.FirstDate, partner.GetDeletedStatus(), partnerID)
 	if err != nil {
 		return entity.Partner{}, fmt.Errorf("can't execute command: %w", err)
 	}
 	//TODO what can i do to return partner updated -- in all repo with mysql
-	return entity.Partner{}, nil
+	row := d.db.QueryRow(`select * from partners where id =? and is_deleted=?`, partnerID, false)
+	var isDeleted bool
+	rErr := row.Scan(&partner.ID, &partner.UserID, &partner.Name, &partner.Birthday, &partner.FirstDate, &isDeleted)
+	if rErr != nil {
+		if rErr == sql.ErrNoRows {
+
+			return entity.Partner{}, nil
+		}
+
+		return entity.Partner{}, fmt.Errorf("can't scan query result: %w", rErr)
+	}
+
+	return partner, nil
 }
+
 func (d *MySQLDB) DoesUserHaveActivePartner(userID int) (bool, entity.Partner, error) {
 	partner := entity.Partner{}
 	// TODO : ask: is better "isDeleted" check in repository or service?
@@ -41,6 +55,5 @@ func (d *MySQLDB) DoesUserHaveActivePartner(userID int) (bool, entity.Partner, e
 
 		return false, entity.Partner{}, fmt.Errorf("can't scan query result: %w", err)
 	}
-
 	return true, partner, nil
 }

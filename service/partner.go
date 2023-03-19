@@ -32,7 +32,11 @@ type CreatePartnerResponse struct {
 }
 
 func (p PartnerService) Create(req CreatePartnerRequest) (CreatePartnerResponse, error) {
-	fmt.Println(req.AuthenticatedUserID)
+	if len(req.Name) < 2 {
+
+		return CreatePartnerResponse{}, fmt.Errorf("the name's len must be longer than 1")
+	}
+
 	partnerExist, _, err := p.repo.DoesUserHaveActivePartner(req.AuthenticatedUserID)
 	if err != nil {
 
@@ -69,6 +73,11 @@ type UpdatePartnerResponse struct {
 }
 
 func (p PartnerService) Update(req UpdatePartnerRequest) (UpdatePartnerResponse, error) {
+	if len(req.Name) < 2 {
+
+		return UpdatePartnerResponse{}, fmt.Errorf("the name's len must be longer than 1")
+	}
+
 	partnerExist, partner, err := p.repo.DoesUserHaveActivePartner(req.AuthenticatedUserID)
 	if err != nil {
 
@@ -78,11 +87,6 @@ func (p PartnerService) Update(req UpdatePartnerRequest) (UpdatePartnerResponse,
 
 		return UpdatePartnerResponse{}, fmt.Errorf("the partner not found")
 	}
-
-	//if partner.UserID != req.AuthenticatedUserID {
-	//
-	//	return UpdatePartnerResponse{}, fmt.Errorf("this user doesn't have permission to update this partner")
-	//}
 
 	if updatedPartner, uErr := p.repo.UpdatePartner(partner.ID, entity.Partner{
 		Name:      req.Name,
@@ -106,30 +110,25 @@ type RemovePartnerResponse struct {
 	Partner entity.Partner
 }
 
-func (p PartnerService) Remove(req RemovePartnerRequest) (RemovePartnerResponse, error) {
+func (p PartnerService) Remove(req RemovePartnerRequest) (bool, error) {
 	partnerExist, partner, err := p.repo.DoesUserHaveActivePartner(req.AuthenticatedUserID)
 	if err != nil {
 
-		return RemovePartnerResponse{}, fmt.Errorf("unexpected error : %w", err)
+		return false, fmt.Errorf("unexpected error : %w", err)
 	}
 	if !partnerExist {
 
-		return RemovePartnerResponse{}, fmt.Errorf("the partner not found")
+		return false, fmt.Errorf("the partner not found")
 	}
-
-	//if partner.UserID != req.AuthenticatedUserID {
-	//
-	//	return RemovePartnerResponse{}, fmt.Errorf("this user doesn't have permission to update this partner")
-	//}
 
 	partner.Delete()
 
-	if updatedPartner, uErr := p.repo.UpdatePartner(partner.ID, partner); uErr != nil {
+	if _, uErr := p.repo.UpdatePartner(partner.ID, partner); uErr != nil {
 
-		return RemovePartnerResponse{}, fmt.Errorf("unexpected error : %w", uErr)
+		return false, fmt.Errorf("unexpected error : %w", uErr)
 	} else {
 
-		return RemovePartnerResponse{updatedPartner}, nil
+		return true, nil
 	}
 
 }

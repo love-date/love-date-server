@@ -30,6 +30,11 @@ type CreateProfileResponse struct {
 }
 
 func (p ProfileService) Create(req CreateProfileRequest) (CreateProfileResponse, error) {
+	if len(req.Name) < 2 {
+
+		return CreateProfileResponse{}, fmt.Errorf("the name's len must be longer than 1")
+	}
+
 	profileExist, _, err := p.repo.DoesThisUserProfileExist(req.AuthenticatedUserID)
 	if err != nil {
 
@@ -67,6 +72,11 @@ type UpdateProfileResponse struct {
 }
 
 func (p ProfileService) Update(req UpdateProfileRequest) (UpdateProfileResponse, error) {
+	if len(req.Name) < 2 {
+
+		return UpdateProfileResponse{}, fmt.Errorf("the name's len must be longer than 1")
+	}
+
 	profileExist, profile, err := p.repo.DoesThisUserProfileExist(req.AuthenticatedUserID)
 	if err != nil {
 
@@ -76,11 +86,6 @@ func (p ProfileService) Update(req UpdateProfileRequest) (UpdateProfileResponse,
 
 		return UpdateProfileResponse{}, fmt.Errorf("the profile not found")
 	}
-
-	//if profile.UserID != req.AuthenticatedUserID {
-	//
-	//	return UpdateProfileResponse{}, fmt.Errorf("this user doesn't have permission to update this profile")
-	//}
 
 	if updatedProfile, uErr := p.repo.Update(profile.ID, entity.Profile{
 		Name:                    req.Name,

@@ -37,10 +37,26 @@ values(?,?,?,?,?)`, profile.UserID, profile.Name, profile.BirthdayNotifyActive, 
 }
 
 func (d *MySQLDB) Update(profileID int, profile entity.Profile) (entity.Profile, error) {
+	fmt.Println("p", profile)
 	_, err := d.db.Exec(`update  profiles set name=? ,birthday_notify_active=? ,special_days_notify_active=? where id=?`,
 		profile.Name, profile.BirthdayNotifyActive, profile.SpecialDaysNotifyActive, profileID)
 	if err != nil {
 		return entity.Profile{}, fmt.Errorf("can't execute command: %w", err)
 	}
-	return entity.Profile{}, nil
+
+	var vipActive bool
+	row := d.db.QueryRow(`select * from profiles where id = ?`, profileID)
+	rErr := row.Scan(&profile.ID, &profile.UserID, &profile.Name, &profile.BirthdayNotifyActive, &profile.SpecialDaysNotifyActive, &vipActive)
+	if err != nil {
+		if err == sql.ErrNoRows {
+
+			return entity.Profile{}, nil
+		}
+
+		return entity.Profile{}, fmt.Errorf("can't scan query result: %w", rErr)
+	}
+
+	profile.UserAsVIP(vipActive)
+
+	return profile, nil
 }

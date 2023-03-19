@@ -3,6 +3,7 @@ package service
 import (
 	"fmt"
 	"love-date/entity"
+	"regexp"
 )
 
 type UserServiceRepository interface {
@@ -33,6 +34,14 @@ type UserCreateResponse struct {
 }
 
 func (u UserService) Create(req UserCreateRequest) (UserCreateResponse, error) {
+
+	emailRegex := regexp.MustCompile(`^[a-z0-9._%+\-]+@[a-z0-9.\-]+\.[a-z]{2,4}$`)
+
+	if len(req.Email) == 0 || !emailRegex.Match([]byte(req.Email)) {
+
+		return UserCreateResponse{}, fmt.Errorf("the email address is not valid format")
+	}
+
 	userExist, _, err := u.repo.DoesThisUserEmailExist(req.Email)
 	if err != nil {
 

@@ -11,9 +11,9 @@ type Partner struct {
 	isDeleted bool
 }
 
-//func (p *Partner) GetDeletedStatus() bool {
-//	return p.isDeleted
-//}
+func (p *Partner) GetDeletedStatus() bool {
+	return p.isDeleted
+}
 
 func (p *Partner) Delete() {
 	p.isDeleted = true
