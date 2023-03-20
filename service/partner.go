@@ -63,9 +63,9 @@ func (p PartnerService) Create(req CreatePartnerRequest) (CreatePartnerResponse,
 
 type UpdatePartnerRequest struct {
 	AuthenticatedUserID int
-	Name                string    `json:"name"`
-	Birthday            time.Time `json:"birthday"`
-	FirstDate           time.Time `json:"first_date"`
+	Name                *string    `json:"name"`
+	Birthday            *time.Time `json:"birthday"`
+	FirstDate           *time.Time `json:"first_date"`
 }
 
 type UpdatePartnerResponse struct {
@@ -73,11 +73,6 @@ type UpdatePartnerResponse struct {
 }
 
 func (p PartnerService) Update(req UpdatePartnerRequest) (UpdatePartnerResponse, error) {
-	if len(req.Name) < 2 {
-
-		return UpdatePartnerResponse{}, fmt.Errorf("the name's len must be longer than 1")
-	}
-
 	partnerExist, partner, err := p.repo.DoesUserHaveActivePartner(req.AuthenticatedUserID)
 	if err != nil {
 
@@ -88,10 +83,24 @@ func (p PartnerService) Update(req UpdatePartnerRequest) (UpdatePartnerResponse,
 		return UpdatePartnerResponse{}, fmt.Errorf("the partner not found")
 	}
 
+	if req.Name != nil {
+		if len(*req.Name) < 2 {
+
+			return UpdatePartnerResponse{}, fmt.Errorf("the name's len must be longer than 1 char")
+		}
+		partner.Name = *req.Name
+	}
+	if req.FirstDate != nil {
+		partner.FirstDate = *req.FirstDate
+	}
+	if req.Birthday != nil {
+		partner.Birthday = *req.Birthday
+	}
+
 	if updatedPartner, uErr := p.repo.UpdatePartner(partner.ID, entity.Partner{
-		Name:      req.Name,
-		Birthday:  req.Birthday,
-		FirstDate: req.FirstDate,
+		Name:      partner.Name,
+		Birthday:  partner.Birthday,
+		FirstDate: partner.FirstDate,
 	}); uErr != nil {
 
 		return UpdatePartnerResponse{}, fmt.Errorf("unexpected error : %w", uErr)

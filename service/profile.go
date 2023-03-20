@@ -61,9 +61,9 @@ func (p ProfileService) Create(req CreateProfileRequest) (CreateProfileResponse,
 }
 
 type UpdateProfileRequest struct {
-	Name                    string `json:"name"`
-	BirthdayNotifyActive    bool   `json:"birthday_notify_active"`
-	SpecialDaysNotifyActive bool   `json:"special_days_notify_active"`
+	Name                    *string `json:"name"`
+	BirthdayNotifyActive    *bool   `json:"birthday_notify_active"`
+	SpecialDaysNotifyActive *bool   `json:"special_days_notify_active"`
 	AuthenticatedUserID     int
 }
 
@@ -72,11 +72,6 @@ type UpdateProfileResponse struct {
 }
 
 func (p ProfileService) Update(req UpdateProfileRequest) (UpdateProfileResponse, error) {
-	if len(req.Name) < 2 {
-
-		return UpdateProfileResponse{}, fmt.Errorf("the name's len must be longer than 1")
-	}
-
 	profileExist, profile, err := p.repo.DoesThisUserProfileExist(req.AuthenticatedUserID)
 	if err != nil {
 
@@ -87,10 +82,24 @@ func (p ProfileService) Update(req UpdateProfileRequest) (UpdateProfileResponse,
 		return UpdateProfileResponse{}, fmt.Errorf("the profile not found")
 	}
 
+	if req.Name != nil {
+		if len(*req.Name) < 2 {
+
+			return UpdateProfileResponse{}, fmt.Errorf("the name's len must be longer than 1 char")
+		}
+		profile.Name = *req.Name
+	}
+	if req.SpecialDaysNotifyActive != nil {
+		profile.SpecialDaysNotifyActive = *req.SpecialDaysNotifyActive
+	}
+	if req.BirthdayNotifyActive != nil {
+		profile.BirthdayNotifyActive = *req.BirthdayNotifyActive
+	}
+
 	if updatedProfile, uErr := p.repo.Update(profile.ID, entity.Profile{
-		Name:                    req.Name,
-		BirthdayNotifyActive:    req.BirthdayNotifyActive,
-		SpecialDaysNotifyActive: req.SpecialDaysNotifyActive,
+		Name:                    profile.Name,
+		BirthdayNotifyActive:    profile.BirthdayNotifyActive,
+		SpecialDaysNotifyActive: profile.SpecialDaysNotifyActive,
 	}); uErr != nil {
 
 		return UpdateProfileResponse{}, fmt.Errorf("unexpected error : %w", uErr)

@@ -25,7 +25,7 @@ func (d *MySQLDB) UpdatePartner(partnerID int, partner entity.Partner) (entity.P
 	if err != nil {
 		return entity.Partner{}, fmt.Errorf("can't execute command: %w", err)
 	}
-	//TODO what can i do to return partner updated -- in all repo with mysql
+	//TODO: what can i do to return partner updated -- in all repo with mysql
 	row := d.db.QueryRow(`select * from partners where id =? and is_deleted=?`, partnerID, false)
 	var isDeleted bool
 	rErr := row.Scan(&partner.ID, &partner.UserID, &partner.Name, &partner.Birthday, &partner.FirstDate, &isDeleted)

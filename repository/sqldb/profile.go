@@ -37,7 +37,6 @@ values(?,?,?,?,?)`, profile.UserID, profile.Name, profile.BirthdayNotifyActive, 
 }
 
 func (d *MySQLDB) Update(profileID int, profile entity.Profile) (entity.Profile, error) {
-	fmt.Println("p", profile)
 	_, err := d.db.Exec(`update  profiles set name=? ,birthday_notify_active=? ,special_days_notify_active=? where id=?`,
 		profile.Name, profile.BirthdayNotifyActive, profile.SpecialDaysNotifyActive, profileID)
 	if err != nil {
