@@ -16,12 +16,11 @@ func SetPartnerRoute(mux *http.ServeMux, repo service.PartnerServiceRepository) 
 	fmt.Println(http.MethodPost + " /partner/create --> create partner route")
 
 	mux.Handle("/partner/get-active", middleware.AuthMiddleware(http.HandlerFunc(partnerHandler.GetUserPartner)))
-	fmt.Println(http.MethodGet + " /partner --> get user active partner route")
+	fmt.Println(http.MethodGet + " /partner/get-active --> get user active partner route")
 
 	mux.Handle("/partner/update", middleware.AuthMiddleware(http.HandlerFunc(partnerHandler.UpdatePartner)))
 	fmt.Println(http.MethodPut + " /partner/update --> update partner route")
 
 	mux.Handle("/partner/delete", middleware.AuthMiddleware(http.HandlerFunc(partnerHandler.DeleteActivePartner)))
-	fmt.Println(http.MethodGet + " /partner --> delete user active partner route")
-
+	fmt.Println(http.MethodGet + " /partner/delete --> delete user active partner route")
 }

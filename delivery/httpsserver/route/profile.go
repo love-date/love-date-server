@@ -16,9 +16,8 @@ func SetProfileRoute(mux *http.ServeMux, repo service.ProfileServiceRepository) 
 	fmt.Println(http.MethodPost + " /profile/create --> create profile route")
 
 	mux.Handle("/profile/get-one", middleware.AuthMiddleware(http.HandlerFunc(profileHandler.GetUserProfile)))
-	fmt.Println(http.MethodGet + " /profile --> get user profile route")
+	fmt.Println(http.MethodGet + " /profile/get-one --> get user profile route")
 
 	mux.Handle("/profile/update", middleware.AuthMiddleware(http.HandlerFunc(profileHandler.UpdateProfile)))
 	fmt.Println(http.MethodPut + " /profile/update --> update profile route")
-
 }

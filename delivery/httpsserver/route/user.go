@@ -43,7 +43,6 @@ func createUser(w http.ResponseWriter, r *http.Request) {
 
 	user, err := userService.Create(service.UserCreateRequest{Email: createUserRequest.Email})
 	if err != nil {
-		fmt.Printf("user error ", err)
 		response.Fail(err.Error(), http.StatusBadRequest).ToJSON(w)
 
 		return
@@ -51,14 +50,12 @@ func createUser(w http.ResponseWriter, r *http.Request) {
 	}
 	token, err := jwttoken.GenerateJWT(user.User.ID, user.User.Email)
 	if err != nil {
-		fmt.Printf(err.Error())
 
 		response.Fail(dErr.Error(), http.StatusUnauthorized).ToJSON(w)
 
 		return
 	}
-	fmt.Printf(token)
-	response.OK("profile loaded", token).ToJSON(w)
+	response.OK("user created", token).ToJSON(w)
 }
 
 func generateJWT(w http.ResponseWriter, r *http.Request) {
