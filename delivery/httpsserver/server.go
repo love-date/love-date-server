@@ -22,7 +22,7 @@ func (s *Server) Start() {
 	route.SetProfileRoute(mux, repo)
 	route.SetPartnerRoute(mux, repo)
 	route.SetUserRoute(mux)
-
+	route.SetAppRoute(mux)
 	fmt.Printf("server is runing on %s:%d\n", s.host, s.port)
 
 	err := http.ListenAndServe(fmt.Sprintf(`%s:%d`, s.host, s.port), mux)
