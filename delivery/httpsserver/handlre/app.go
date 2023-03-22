@@ -4,12 +4,10 @@ import (
 	"fmt"
 	"love-date/delivery/httpsserver/response"
 	"love-date/pkg/specialday"
-	"love-date/service"
 	"net/http"
 )
 
 type AppHandler struct {
-	service service.PartnerService
 }
 
 func NewAppHandler() AppHandler {

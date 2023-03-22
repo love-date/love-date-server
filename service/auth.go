@@ -13,24 +13,30 @@ type AuthService struct {
 	UserService UserService
 }
 
-type RegisterRequest struct {
-	tokenString string
+func NewAuthService(repo AuthServiceRepository, userService UserService) AuthService {
+
+	return AuthService{repo, userService}
 }
-type RegisterResponse struct {
+
+type ValidateTokenRequest struct {
+	TokenType string `json:"token_type"`
+	Token     string `json:"token"`
+}
+type ValidateTokenResponse struct {
 	User entity.User
 }
 
-func (a AuthService) RegisterOrLogin(req RegisterRequest) (RegisterResponse, error) {
-	userEmail, vErr := a.repo.ValidateOauthJWT(req.tokenString)
+func (a AuthService) RegisterOrLogin(req ValidateTokenRequest) (ValidateTokenResponse, error) {
+	userEmail, vErr := a.repo.ValidateOauthJWT(req.Token)
 	if vErr != nil {
 
-		return RegisterResponse{}, fmt.Errorf("unexpected error: %w", vErr)
+		return ValidateTokenResponse{}, fmt.Errorf("unexpected error: %w", vErr)
 	}
 
 	userExist, user, uErr := a.UserService.repo.DoesThisUserEmailExist(userEmail)
 	if uErr != nil {
 
-		return RegisterResponse{}, fmt.Errorf("unexpected error: %w", vErr)
+		return ValidateTokenResponse{}, fmt.Errorf("unexpected error: %w", vErr)
 	}
 
 	if !userExist {
@@ -38,11 +44,11 @@ func (a AuthService) RegisterOrLogin(req RegisterRequest) (RegisterResponse, err
 			userEmail,
 		}); err != nil {
 
-			return RegisterResponse{}, fmt.Errorf("unexpected error: %w", err)
+			return ValidateTokenResponse{}, fmt.Errorf("unexpected error: %w", err)
 		} else {
 			user = createUserResponse.User
 		}
 	}
 
-	return RegisterResponse{user}, nil
+	return ValidateTokenResponse{user}, nil
 }
