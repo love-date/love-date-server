@@ -2,28 +2,24 @@ package handlre
 
 import (
 	"fmt"
-	"golang.org/x/oauth2"
-	"golang.org/x/oauth2/google"
 	"love-date/delivery/httpsserver/response"
 	"love-date/pkg/jwttoken"
-	"love-date/pkg/oauth"
 	"love-date/service"
 	"net/http"
 )
 
 type AuthHandler struct {
-	userService service.UserService
+	authService service.AuthService
 }
 
-func NewAuthHandler(userService service.UserService) AuthHandler {
+func NewAuthHandler(authService service.AuthService) AuthHandler {
 
-	return AuthHandler{userService}
+	return AuthHandler{authService}
 }
 
 func (a AuthHandler) ValidateOauthToken(w http.ResponseWriter, r *http.Request) {
 	switch r.Method {
 	case http.MethodPost:
-		var validateTokenResponse service.ValidateTokenResponse
 		validateTokenRequest := &service.ValidateTokenRequest{}
 
 		dErr := DecodeJSON(r.Body, validateTokenRequest)
@@ -33,19 +29,11 @@ func (a AuthHandler) ValidateOauthToken(w http.ResponseWriter, r *http.Request) 
 			return
 		}
 
-		switch validateTokenRequest.TokenType {
-		case "google":
-			var vErr error
+		validateTokenResponse, aErr := a.authService.RegisterOrLogin(*validateTokenRequest)
+		if aErr != nil {
+			response.Fail(aErr.Error(), http.StatusBadRequest).ToJSON(w)
 
-			validateTokenResponse, vErr = a.validateGoogleToken(*validateTokenRequest)
-			if vErr != nil {
-
-				response.Fail(vErr.Error(), http.StatusBadRequest).ToJSON(w)
-
-				return
-			}
-		default:
-			response.Fail(fmt.Sprintf("this token type is not supported: %s", validateTokenRequest.TokenType), http.StatusNotFound).ToJSON(w)
+			return
 		}
 
 		token, jErr := jwttoken.GenerateJWT(validateTokenResponse.User.ID, validateTokenResponse.User.Email)
@@ -61,25 +49,4 @@ func (a AuthHandler) ValidateOauthToken(w http.ResponseWriter, r *http.Request) 
 	default:
 		response.Fail(fmt.Sprintf("this method | %s | isn`t found at this path", r.Method), http.StatusNotFound).ToJSON(w)
 	}
-}
-
-func (a AuthHandler) validateGoogleToken(validateTokenRequest service.ValidateTokenRequest) (service.ValidateTokenResponse, error) {
-	conf := &oauth2.Config{
-		ClientID:     "399793366330-q375vhvmsok3343t7k2qto0mp2r81nks.apps.googleusercontent.com",
-		ClientSecret: "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",
-		Endpoint:     google.Endpoint,
-		RedirectURL:  "http://localhost:1988/google/callback",
-		Scopes:       []string{"https://www.googleapis.com/auth/userinfo.email"},
-	}
-
-	googleOauthService := oauth.NewGoogleOauth(conf)
-	authService := service.NewAuthService(googleOauthService, a.userService)
-
-	validateTokenResponse, cErr := authService.RegisterOrLogin(validateTokenRequest)
-	if cErr != nil {
-		return service.ValidateTokenResponse{}, cErr
-	}
-
-	return validateTokenResponse, nil
-
 }

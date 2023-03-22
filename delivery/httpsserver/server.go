@@ -3,6 +3,7 @@ package httpsserver
 import (
 	"fmt"
 	"love-date/delivery/httpsserver/route"
+	"love-date/pkg/oauth"
 	"love-date/repository/sqldb"
 	"love-date/service"
 	"net/http"
@@ -24,10 +25,11 @@ func (s *Server) Start() {
 	partnerService := service.NewPartnerService(repo)
 	profileService := service.NewProfileService(repo)
 	userService := service.NewUserService(repo, partnerService, profileService)
-
+	oauthService := oauth.NewOauthProvider()
+	authService := service.NewAuthService(oauthService, userService)
 	route.SetProfileRoute(mux, &profileService)
 	route.SetPartnerRoute(mux, &partnerService)
-	route.SetAuthRoute(mux, &userService)
+	route.SetAuthRoute(mux, &authService)
 	route.SetUserRoute(mux, &userService)
 	route.SetAppRoute(mux)
 

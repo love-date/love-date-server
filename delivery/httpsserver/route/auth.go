@@ -7,8 +7,9 @@ import (
 	"net/http"
 )
 
-func SetAuthRoute(mux *http.ServeMux, userService *service.UserService) {
-	authHandler := handlre.NewAuthHandler(*userService)
+func SetAuthRoute(mux *http.ServeMux, authService *service.AuthService) {
+
+	authHandler := handlre.NewAuthHandler(*authService)
 
 	mux.Handle("/validate-token", http.HandlerFunc(authHandler.ValidateOauthToken))
 	fmt.Println(http.MethodPost + " /validate-token --> validate token and generate jwt route")

@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
-	"golang.org/x/oauth2"
 	"io"
 	"net/http"
 )
@@ -13,15 +12,13 @@ type GoogleUser struct {
 	Email string `json:"email"`
 }
 
-type GoogleOauth struct {
-	config *oauth2.Config
+type OauthProvider struct{}
+
+func NewOauthProvider() OauthProvider {
+	return OauthProvider{}
 }
 
-func NewGoogleOauth(conf *oauth2.Config) GoogleOauth {
-	return GoogleOauth{conf}
-}
-
-func (g GoogleOauth) ValidateOauthJWT(token string) (email string, err error) {
+func (g OauthProvider) GoogleValidateOauthJWT(token string) (email string, err error) {
 	var googleUser = new(GoogleUser)
 	response, gErr := http.Get("https://www.googleapis.com/oauth2/v2/userinfo?access_token=" + token)
 	if gErr != nil {

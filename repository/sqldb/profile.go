@@ -46,8 +46,8 @@ func (d *MySQLDB) Update(profileID int, profile entity.Profile) (entity.Profile,
 	var vipActive bool
 	row := d.db.QueryRow(`select * from profiles where id = ?`, profileID)
 	rErr := row.Scan(&profile.ID, &profile.UserID, &profile.Name, &profile.BirthdayNotifyActive, &profile.SpecialDaysNotifyActive, &vipActive)
-	if err != nil {
-		if err == sql.ErrNoRows {
+	if rErr != nil {
+		if rErr == sql.ErrNoRows {
 
 			return entity.Profile{}, nil
 		}

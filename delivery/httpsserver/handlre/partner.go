@@ -53,13 +53,6 @@ func (p PartnerHandler) GetUserPartner(w http.ResponseWriter, r *http.Request) {
 	case http.MethodGet:
 		getPartnerRequest := &service.GetUserActivePartnerRequest{}
 
-		dErr := DecodeJSON(r.Body, getPartnerRequest)
-		if dErr != nil {
-			response.Fail(dErr.Error(), http.StatusBadRequest).ToJSON(w)
-
-			return
-		}
-
 		userID := r.Context().Value("user_id").(int)
 		getPartnerRequest.AuthenticatedUserID = userID
 

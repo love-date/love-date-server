@@ -3,10 +3,11 @@ package service
 import (
 	"fmt"
 	"love-date/entity"
+	"strings"
 )
 
 type AuthServiceRepository interface {
-	ValidateOauthJWT(tokenString string) (email string, err error)
+	GoogleValidateOauthJWT(tokenString string) (email string, err error)
 }
 type AuthService struct {
 	repo        AuthServiceRepository
@@ -27,16 +28,25 @@ type ValidateTokenResponse struct {
 }
 
 func (a AuthService) RegisterOrLogin(req ValidateTokenRequest) (ValidateTokenResponse, error) {
-	userEmail, vErr := a.repo.ValidateOauthJWT(req.Token)
-	if vErr != nil {
+	var userEmail string
 
-		return ValidateTokenResponse{}, fmt.Errorf("unexpected error: %w", vErr)
+	switch strings.ToLower(req.TokenType) {
+	case "google":
+		var vErr error
+		userEmail, vErr = a.repo.GoogleValidateOauthJWT(req.Token)
+		if vErr != nil {
+
+			return ValidateTokenResponse{}, fmt.Errorf("unexpected error: %w", vErr)
+		}
+	default:
+
+		return ValidateTokenResponse{}, fmt.Errorf("this token type is not supported: %s", req.TokenType)
 	}
 
 	userExist, user, uErr := a.UserService.repo.DoesThisUserEmailExist(userEmail)
 	if uErr != nil {
 
-		return ValidateTokenResponse{}, fmt.Errorf("unexpected error: %w", vErr)
+		return ValidateTokenResponse{}, fmt.Errorf("unexpected error: %w", uErr)
 	}
 
 	if !userExist {

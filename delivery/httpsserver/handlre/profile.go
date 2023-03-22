@@ -52,13 +52,6 @@ func (p ProfileHandler) GetUserProfile(w http.ResponseWriter, r *http.Request) {
 	case http.MethodGet:
 		getProfileRequest := &service.GetProfileRequest{}
 
-		dErr := DecodeJSON(r.Body, getProfileRequest)
-		if dErr != nil {
-			response.Fail(dErr.Error(), http.StatusBadRequest).ToJSON(w)
-
-			return
-		}
-
 		userID := r.Context().Value("user_id").(int)
 		getProfileRequest.AuthenticatedUserID = userID
 
