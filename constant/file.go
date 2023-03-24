@@ -1,3 +1,3 @@
 package constant
 
-const SpecialDaysFilePath = "./special_days.json"
+const SpecialDaysFilePath string = "./special_days.json"

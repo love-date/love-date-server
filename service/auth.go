@@ -2,6 +2,7 @@ package service
 
 import (
 	"fmt"
+	"love-date/constant"
 	"love-date/entity"
 	"strings"
 )
@@ -31,7 +32,7 @@ func (a AuthService) RegisterOrLogin(req ValidateTokenRequest) (ValidateTokenRes
 	var userEmail string
 
 	switch strings.ToLower(req.TokenType) {
-	case "google":
+	case constant.GoogleOauthType:
 		var vErr error
 		userEmail, vErr = a.repo.GoogleValidateOauthJWT(req.Token)
 		if vErr != nil {
