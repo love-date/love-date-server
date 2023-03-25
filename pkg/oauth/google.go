@@ -23,8 +23,9 @@ func (g OauthProvider) GoogleValidateOauthJWT(token string) (email string, err e
 	response, gErr := http.Get("https://www.googleapis.com/oauth2/v2/userinfo?access_token=" + token)
 	if gErr != nil {
 
-		return "", fmt.Errorf("failed getting user info: %s", gErr.Error())
+		return "", fmt.Errorf("failed getting user info: %w", gErr)
 	}
+
 	contents, err := io.ReadAll(response.Body)
 	if err != nil {
 		return "", fmt.Errorf("failed reading response body: %s", err.Error())

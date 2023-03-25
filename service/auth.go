@@ -9,6 +9,7 @@ import (
 
 type AuthServiceRepository interface {
 	GoogleValidateOauthJWT(tokenString string) (email string, err error)
+	AppleValidateOauthJWT(tokenString string) (email string, err error)
 }
 type AuthService struct {
 	repo        AuthServiceRepository
@@ -35,6 +36,13 @@ func (a AuthService) RegisterOrLogin(req ValidateTokenRequest) (ValidateTokenRes
 	case constant.GoogleOauthType:
 		var vErr error
 		userEmail, vErr = a.repo.GoogleValidateOauthJWT(req.Token)
+		if vErr != nil {
+
+			return ValidateTokenResponse{}, fmt.Errorf("unexpected error: %w", vErr)
+		}
+	case constant.AppleOauthType:
+		var vErr error
+		userEmail, vErr = a.repo.AppleValidateOauthJWT(req.Token)
 		if vErr != nil {
 
 			return ValidateTokenResponse{}, fmt.Errorf("unexpected error: %w", vErr)
