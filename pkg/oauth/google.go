@@ -12,13 +12,13 @@ type GoogleUser struct {
 	Email string `json:"email"`
 }
 
-type OauthProvider struct{}
+type Provider struct{}
 
-func NewOauthProvider() OauthProvider {
-	return OauthProvider{}
+func NewOauthProvider() Provider {
+	return Provider{}
 }
 
-func (g OauthProvider) GoogleValidateOauthJWT(token string) (email string, err error) {
+func (g Provider) GoogleValidateOauthJWT(token string) (email string, err error) {
 	var googleUser = new(GoogleUser)
 	response, gErr := http.Get("https://www.googleapis.com/oauth2/v2/userinfo?access_token=" + token)
 	if gErr != nil {

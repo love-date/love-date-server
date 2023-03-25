@@ -9,7 +9,7 @@ type AppleUser struct {
 	Email string `json:"email"`
 }
 
-func (g OauthProvider) AppleValidateOauthJWT(token string) (email string, err error) {
+func (g Provider) AppleValidateOauthJWT(token string) (email string, err error) {
 	var appleUser = new(AppleUser)
 	user, err := apple.GetUserInfoFromIDToken(token)
 	if err != nil {
