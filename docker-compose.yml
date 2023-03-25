@@ -12,7 +12,7 @@ services:
     command: ['mysqld', '--character-set-server=utf8mb4', '--collation-server=utf8mb4_unicode_ci']
     environment:
       MYSQL_ROOT_PASSWORD: loveappRoo7t0lk2o20
-      MYSQL_DATABASE: loveapp-db
+      MYSQL_DATABASE: loveapp
       MYSQL_USER: loveapptest
       MYSQL_PASSWORD: loveapptest123
 
