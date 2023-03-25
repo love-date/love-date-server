@@ -11,6 +11,7 @@ type SpecialDays = map[int]string
 
 func GetSpecialDays() (*SpecialDays, error) {
 	var specialDays = new(SpecialDays)
+
 	file, rErr := os.ReadFile(constant.SpecialDaysFilePath)
 	if rErr != nil {
 
@@ -23,5 +24,4 @@ func GetSpecialDays() (*SpecialDays, error) {
 	}
 
 	return specialDays, nil
-
 }

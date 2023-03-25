@@ -9,7 +9,6 @@ import (
 
 func SetAppRoute(mux *http.ServeMux) {
 	appHandler := handlre.NewAppHandler()
-
-	mux.Handle("app/special-day", middleware.AuthMiddleware(http.HandlerFunc(appHandler.GetSpecialDays)))
-	fmt.Println(http.MethodPost + " app/special-day --> get all special days route")
+	mux.Handle("/app/special-day", middleware.AuthMiddleware(http.HandlerFunc(appHandler.GetSpecialDays)))
+	fmt.Println(http.MethodGet + " app/special-day --> get all special days route")
 }
