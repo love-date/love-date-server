@@ -26,7 +26,7 @@ type Config struct {
 func New() *Config {
 	return &Config{
 		Server: HttpServerConfig{
-			Host: getEnv("SERVER_HOST", "127.0.0.1"),
+			Host: getEnv("SERVER_HOST", ""),
 			Port: getEnvAsInt("SERVER_PORT", 1988),
 		},
 		SqlDB: SqlDataBase{
