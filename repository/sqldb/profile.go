@@ -10,7 +10,7 @@ func (d *MySQLDB) DoesThisUserProfileExist(userID int) (bool, entity.Profile, er
 	profile := entity.Profile{}
 	var vipActive bool
 	row := d.db.QueryRow(`select * from profiles where user_id = ?`, userID)
-	err := row.Scan(&profile.ID, &profile.UserID, &profile.Name, &profile.BirthdayNotifyActive, &profile.SpecialDaysNotifyActive, &vipActive)
+	err := row.Scan(&profile.ID, &profile.UserID, &profile.Name, &profile.SpecialDaysNotifyActive, &profile.BirthdayNotifyActive, &vipActive)
 	profile.UserAsVIP(vipActive)
 	if err != nil {
 		if err == sql.ErrNoRows {
@@ -24,8 +24,8 @@ func (d *MySQLDB) DoesThisUserProfileExist(userID int) (bool, entity.Profile, er
 }
 
 func (d *MySQLDB) CreateProfile(profile entity.Profile) (entity.Profile, error) {
-	res, err := d.db.Exec(`insert into profiles(user_id,name,birthday_notify_active,special_days_notify_active,vip_active)
-values(?,?,?,?,?)`, profile.UserID, profile.Name, profile.BirthdayNotifyActive, profile.SpecialDaysNotifyActive, false)
+	res, err := d.db.Exec(`insert into profiles(user_id,name,special_days_notify_active,birthday_notify_active,vip_active)
+values(?,?,?,?,?)`, profile.UserID, profile.Name, profile.SpecialDaysNotifyActive, profile.BirthdayNotifyActive, false)
 	if err != nil {
 		return entity.Profile{}, fmt.Errorf("can't execute command: %w", err)
 	}
@@ -37,15 +37,15 @@ values(?,?,?,?,?)`, profile.UserID, profile.Name, profile.BirthdayNotifyActive, 
 }
 
 func (d *MySQLDB) Update(profileID int, profile entity.Profile) (entity.Profile, error) {
-	_, err := d.db.Exec(`update  profiles set name=? ,birthday_notify_active=? ,special_days_notify_active=? where id=?`,
-		profile.Name, profile.BirthdayNotifyActive, profile.SpecialDaysNotifyActive, profileID)
+	_, err := d.db.Exec(`update  profiles set name=? ,special_days_notify_active=? ,birthday_notify_active=?  where id=?`,
+		profile.Name, profile.SpecialDaysNotifyActive, profile.BirthdayNotifyActive, profileID)
 	if err != nil {
 		return entity.Profile{}, fmt.Errorf("can't execute command: %w", err)
 	}
 
 	var vipActive bool
 	row := d.db.QueryRow(`select * from profiles where id = ?`, profileID)
-	rErr := row.Scan(&profile.ID, &profile.UserID, &profile.Name, &profile.BirthdayNotifyActive, &profile.SpecialDaysNotifyActive, &vipActive)
+	rErr := row.Scan(&profile.ID, &profile.UserID, &profile.Name, &profile.SpecialDaysNotifyActive, &profile.BirthdayNotifyActive, &vipActive)
 	if rErr != nil {
 		if rErr == sql.ErrNoRows {
 

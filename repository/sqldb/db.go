@@ -4,20 +4,11 @@ import (
 	"database/sql"
 	"fmt"
 	_ "github.com/go-sql-driver/mysql"
-	"github.com/joho/godotenv"
-	"log"
 	"love-date/config"
 	"time"
 )
 
 var conf *config.Config
-
-func init() {
-	// loads values from .env into the system
-	if err := godotenv.Load(); err != nil {
-		log.Print("No .env file found")
-	}
-}
 
 type MySQLDB struct {
 	db *sql.DB

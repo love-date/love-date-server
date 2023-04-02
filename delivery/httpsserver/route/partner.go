@@ -2,14 +2,14 @@ package route
 
 import (
 	"fmt"
-	"love-date/delivery/httpsserver/handlre"
+	"love-date/delivery/httpsserver/handler"
 	"love-date/delivery/httpsserver/middleware"
 	"love-date/service"
 	"net/http"
 )
 
 func SetPartnerRoute(mux *http.ServeMux, partnerService *service.PartnerService) {
-	partnerHandler := handlre.NewPartnerHandler(*partnerService)
+	partnerHandler := handler.NewPartnerHandler(*partnerService)
 
 	mux.Handle("/partners/create", middleware.AuthMiddleware(http.HandlerFunc(partnerHandler.CreateNewPartner)))
 	fmt.Println(http.MethodPost + " /partners/create --> create partner route")

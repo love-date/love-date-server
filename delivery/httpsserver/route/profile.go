@@ -2,14 +2,14 @@ package route
 
 import (
 	"fmt"
-	"love-date/delivery/httpsserver/handlre"
+	"love-date/delivery/httpsserver/handler"
 	"love-date/delivery/httpsserver/middleware"
 	"love-date/service"
 	"net/http"
 )
 
 func SetProfileRoute(mux *http.ServeMux, profileService *service.ProfileService) {
-	profileHandler := handlre.NewProfileHandler(*profileService)
+	profileHandler := handler.NewProfileHandler(*profileService)
 
 	mux.Handle("/profiles/create", middleware.AuthMiddleware(http.HandlerFunc(profileHandler.CreateNewProfile)))
 	fmt.Println(http.MethodPost + " /profiles/create --> create profile route")

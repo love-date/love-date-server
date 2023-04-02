@@ -3,11 +3,14 @@ package jwttoken
 import (
 	"fmt"
 	"github.com/golang-jwt/jwt/v4"
+	"love-date/config"
 	"net/http"
 	"time"
 )
 
-var jwtKey = []byte("GoLinuxCloudKey")
+var conf *config.Config = config.New()
+
+var jwtKey = []byte(conf.Jwt.Key)
 
 type Claims struct {
 	Email  string `json:"email"`
@@ -16,7 +19,7 @@ type Claims struct {
 }
 
 func GenerateJWT(userID int, email string) (string, error) {
-	expirationTime := time.Now().Add(8760 * time.Minute)
+	expirationTime := time.Now().Add(8760 * time.Hour) //One year
 	claims := &Claims{
 		Email:  email,
 		UserID: userID,

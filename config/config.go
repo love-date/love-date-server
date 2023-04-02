@@ -5,12 +5,12 @@ import (
 	"strconv"
 )
 
-type HttpServerConfig struct {
+type httpServerConfig struct {
 	Host string
 	Port int
 }
 
-type SqlDataBase struct {
+type sqlDataBase struct {
 	Username string
 	Password string
 	Host     string
@@ -18,24 +18,30 @@ type SqlDataBase struct {
 	Name     string
 }
 
+type jwt struct {
+	Key string
+}
+
 type Config struct {
-	Server HttpServerConfig
-	SqlDB  SqlDataBase
+	Server httpServerConfig
+	SqlDB  sqlDataBase
+	Jwt    jwt
 }
 
 func New() *Config {
 	return &Config{
-		Server: HttpServerConfig{
+		Server: httpServerConfig{
 			Host: getEnv("SERVER_HOST", ""),
 			Port: getEnvAsInt("SERVER_PORT", 1988),
 		},
-		SqlDB: SqlDataBase{
+		SqlDB: sqlDataBase{
 			Username: getEnv("DB_USERNAME", "masood"),
 			Password: getEnv("DB_PASSWORD", ""),
 			Host:     getEnv("DB_HOST", ""),
 			Port:     getEnv("DB_PORT", ""),
 			Name:     getEnv("DB_NAME", ""),
 		},
+		Jwt: jwt{Key: getEnv("JWT_KEY", "test123jwt")},
 	}
 }
 

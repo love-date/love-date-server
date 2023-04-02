@@ -13,7 +13,6 @@ func AuthMiddleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		authHeader := strings.Split(r.Header.Get("Authorization"), "Bearer ")
 		if len(authHeader) != 2 {
-			w.WriteHeader(http.StatusUnauthorized)
 			response.Fail("Malformed token", http.StatusUnauthorized).ToJSON(w)
 
 			return
