@@ -3,6 +3,7 @@ package service
 import (
 	"fmt"
 	"love-date/entity"
+	"love-date/errorType"
 	"time"
 )
 
@@ -157,8 +158,9 @@ func (p PartnerService) GetUserActivePartner(req GetUserActivePartnerRequest) (G
 		return GetUserActivePartnerResponse{}, fmt.Errorf("unexpected error : %w", err)
 	}
 	if !partnerExist {
+		return GetUserActivePartnerResponse{}, errorType.NotExistData
 
-		return GetUserActivePartnerResponse{}, fmt.Errorf("this user has't any active partner")
+		//return GetUserActivePartnerResponse{}, fmt.Errorf("this user has't any active partner")
 	}
 
 	return GetUserActivePartnerResponse{partner}, err

@@ -3,6 +3,7 @@ package handler
 import (
 	"fmt"
 	"love-date/delivery/httpsserver/response"
+	"love-date/errorType"
 	"love-date/service"
 	"net/http"
 )
@@ -58,6 +59,11 @@ func (p PartnerHandler) GetUserPartner(w http.ResponseWriter, r *http.Request) {
 
 		partner, cErr := p.service.GetUserActivePartner(*getPartnerRequest)
 		if cErr != nil {
+			if cErr == errorType.NotExistData {
+				response.Fail(cErr.Error(), http.StatusNoContent).ToJSON(w)
+
+				return
+			}
 			response.Fail(cErr.Error(), http.StatusBadRequest).ToJSON(w)
 
 			return

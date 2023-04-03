@@ -3,6 +3,7 @@ package handler
 import (
 	"fmt"
 	"love-date/delivery/httpsserver/response"
+	"love-date/errorType"
 	"love-date/service"
 	"net/http"
 )
@@ -56,7 +57,14 @@ func (p ProfileHandler) GetUserProfile(w http.ResponseWriter, r *http.Request) {
 		getProfileRequest.AuthenticatedUserID = userID
 
 		profile, cErr := p.service.GetUserProfile(*getProfileRequest)
+
 		if cErr != nil {
+
+			if cErr == errorType.NotExistData {
+				response.Fail(cErr.Error(), http.StatusNoContent).ToJSON(w)
+
+				return
+			}
 			response.Fail(cErr.Error(), http.StatusBadRequest).ToJSON(w)
 
 			return

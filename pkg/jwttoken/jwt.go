@@ -8,9 +8,7 @@ import (
 	"time"
 )
 
-var conf *config.Config = config.New()
-
-var jwtKey = []byte(conf.Jwt.Key)
+var conf *config.Config
 
 type Claims struct {
 	Email  string `json:"email"`
@@ -19,6 +17,8 @@ type Claims struct {
 }
 
 func GenerateJWT(userID int, email string) (string, error) {
+	conf = config.New()
+
 	expirationTime := time.Now().Add(8760 * time.Hour) //One year
 	claims := &Claims{
 		Email:  email,
@@ -30,7 +30,7 @@ func GenerateJWT(userID int, email string) (string, error) {
 
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
 
-	tokenString, err := token.SignedString(jwtKey)
+	tokenString, err := token.SignedString([]byte(conf.Jwt.Key))
 	if err != nil {
 
 		return "", err
@@ -40,10 +40,12 @@ func GenerateJWT(userID int, email string) (string, error) {
 }
 
 func ValidateJWT(tokenString string) (bool, Claims, int, error) {
+	conf = config.New()
+
 	claims := &Claims{}
 	tkn, err := jwt.ParseWithClaims(tokenString, claims, func(token *jwt.Token) (interface{}, error) {
 
-		return jwtKey, nil
+		return []byte(conf.Jwt.Key), nil
 	})
 	if err != nil {
 

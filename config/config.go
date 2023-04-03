@@ -41,7 +41,9 @@ func New() *Config {
 			Port:     getEnv("DB_PORT", ""),
 			Name:     getEnv("DB_NAME", ""),
 		},
-		Jwt: jwt{Key: getEnv("JWT_KEY", "test123jwt")},
+		Jwt: jwt{
+			Key: getEnv("JWT_KEY", "test123jwt"),
+		},
 	}
 }
 

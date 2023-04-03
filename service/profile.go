@@ -3,6 +3,7 @@ package service
 import (
 	"fmt"
 	"love-date/entity"
+	"love-date/errorType"
 )
 
 type ProfileServiceRepository interface {
@@ -125,7 +126,9 @@ func (p ProfileService) GetUserProfile(req GetProfileRequest) (GetProfileRespons
 	}
 	if !profileExist {
 
-		return GetProfileResponse{}, fmt.Errorf("the profile not found")
+		//return GetProfileResponse{}, fmt.Errorf("the profile not found")
+		return GetProfileResponse{}, errorType.NotExistData
+
 	}
 
 	return GetProfileResponse{profile}, nil
