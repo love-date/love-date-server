@@ -81,7 +81,7 @@ func (p PartnerService) Update(req UpdatePartnerRequest) (UpdatePartnerResponse,
 	}
 	if !partnerExist {
 
-		return UpdatePartnerResponse{}, fmt.Errorf("the partner not found")
+		return UpdatePartnerResponse{}, errorType.NotExistData
 	}
 
 	if req.Name != nil {
@@ -128,7 +128,7 @@ func (p PartnerService) Remove(req RemovePartnerRequest) (bool, error) {
 	}
 	if !partnerExist {
 
-		return false, fmt.Errorf("the partner not found")
+		return false, errorType.NotExistData
 	}
 
 	partner.Delete()

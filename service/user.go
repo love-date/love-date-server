@@ -75,7 +75,6 @@ type AppendPartnerNameResponse struct {
 func (u UserService) AppendNames(req AppendPartnerNameRequest) (AppendPartnerNameResponse, error) {
 	profileResult, err := u.profileService.GetUserProfile(GetProfileRequest{req.AuthenticatedUserID})
 	if err != nil {
-
 		return AppendPartnerNameResponse{}, fmt.Errorf("can't get profile : %w", err)
 	}
 

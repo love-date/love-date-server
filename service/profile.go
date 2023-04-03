@@ -80,7 +80,7 @@ func (p ProfileService) Update(req UpdateProfileRequest) (UpdateProfileResponse,
 	}
 	if !profileExist {
 
-		return UpdateProfileResponse{}, fmt.Errorf("the profile not found")
+		return UpdateProfileResponse{}, errorType.NotExistData
 	}
 
 	if req.Name != nil {

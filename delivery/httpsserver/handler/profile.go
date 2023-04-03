@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"errors"
 	"fmt"
 	"love-date/delivery/httpsserver/response"
 	"love-date/errorType"
@@ -60,11 +61,12 @@ func (p ProfileHandler) GetUserProfile(w http.ResponseWriter, r *http.Request) {
 
 		if cErr != nil {
 
-			if cErr == errorType.NotExistData {
+			if cErr == errorType.NotExistData || errors.Unwrap(cErr) == errorType.NotExistData {
 				response.Fail(cErr.Error(), http.StatusNoContent).ToJSON(w)
 
 				return
 			}
+
 			response.Fail(cErr.Error(), http.StatusBadRequest).ToJSON(w)
 
 			return
