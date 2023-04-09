@@ -95,6 +95,12 @@ func (p ProfileHandler) UpdateProfile(w http.ResponseWriter, r *http.Request) {
 
 		updatedProfile, err := p.service.Update(*updateProfileRequest)
 		if err != nil {
+			if err == errorType.NotExistData || errors.Unwrap(err) == errorType.NotExistData {
+				response.Fail(err.Error(), http.StatusNoContent).ToJSON(w)
+
+				return
+			}
+
 			response.Fail(err.Error(), http.StatusBadRequest).ToJSON(w)
 
 			return
