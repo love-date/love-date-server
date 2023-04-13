@@ -66,13 +66,13 @@ func (p PartnerHandler) GetUserPartner(w http.ResponseWriter, r *http.Request) {
 
 				return
 			}
-			
+
 			response.Fail(cErr.Error(), http.StatusBadRequest).ToJSON(w)
 
 			return
 		}
 
-		response.OK("partner loaded", partner).ToJSON(w)
+		response.OK("partner loaded", partner.Partner).ToJSON(w)
 
 	default:
 		response.Fail(fmt.Sprintf("this method | %s | isn`t found at this path", r.Method), http.StatusNotFound).ToJSON(w)
