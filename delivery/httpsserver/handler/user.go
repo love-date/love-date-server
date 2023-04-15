@@ -1,10 +1,9 @@
 package handler
 
 import (
-	"errors"
 	"fmt"
 	"love-date/delivery/httpsserver/response"
-	"love-date/errorType"
+	"love-date/pkg/errhandling/httpmapper"
 	"love-date/service"
 	"net/http"
 )
@@ -28,14 +27,8 @@ func (p UserHandler) AppendNames(w http.ResponseWriter, r *http.Request) {
 
 		appendedNames, cErr := p.service.AppendNames(service.AppendPartnerNameRequest{AuthenticatedUserID: userID})
 		if cErr != nil {
-
-			if cErr == errorType.NotExistData || errors.Unwrap(cErr) == errorType.NotExistData {
-				response.Fail(cErr.Error(), http.StatusNoContent).ToJSON(w)
-
-				return
-			}
-
-			response.Fail(cErr.Error(), http.StatusBadRequest).ToJSON(w)
+			msg, code := httpmapper.Error(cErr)
+			response.Fail(msg, code).ToJSON(w)
 
 			return
 		}

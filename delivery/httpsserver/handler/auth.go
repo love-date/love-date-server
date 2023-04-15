@@ -3,6 +3,7 @@ package handler
 import (
 	"fmt"
 	"love-date/delivery/httpsserver/response"
+	"love-date/pkg/errhandling/httpmapper"
 	"love-date/pkg/jwttoken"
 	"love-date/service"
 	"net/http"
@@ -24,14 +25,16 @@ func (a AuthHandler) ValidateOauthToken(w http.ResponseWriter, r *http.Request) 
 
 		dErr := DecodeJSON(r.Body, validateTokenRequest)
 		if dErr != nil {
-			response.Fail(dErr.Error(), http.StatusBadRequest).ToJSON(w)
+			msg, code := httpmapper.Error(dErr)
+			response.Fail(msg, code).ToJSON(w)
 
 			return
 		}
 
 		validateTokenResponse, aErr := a.authService.RegisterOrLogin(*validateTokenRequest)
 		if aErr != nil {
-			response.Fail(aErr.Error(), http.StatusBadRequest).ToJSON(w)
+			msg, code := httpmapper.Error(aErr)
+			response.Fail(msg, code).ToJSON(w)
 
 			return
 		}
@@ -39,7 +42,8 @@ func (a AuthHandler) ValidateOauthToken(w http.ResponseWriter, r *http.Request) 
 		token, jErr := jwttoken.GenerateJWT(validateTokenResponse.User.ID, validateTokenResponse.User.Email)
 		if jErr != nil {
 
-			response.Fail(jErr.Error(), http.StatusUnauthorized).ToJSON(w)
+			msg, code := httpmapper.Error(jErr)
+			response.Fail(msg, code).ToJSON(w)
 
 			return
 		}

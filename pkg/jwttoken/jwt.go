@@ -1,10 +1,10 @@
 package jwttoken
 
 import (
-	"fmt"
 	"github.com/golang-jwt/jwt/v4"
 	"love-date/config"
-	"net/http"
+	"love-date/pkg/errhandling/errmsg"
+	"love-date/pkg/errhandling/richerror"
 	"time"
 )
 
@@ -17,6 +17,8 @@ type Claims struct {
 }
 
 func GenerateJWT(userID int, email string) (string, error) {
+	const op = "jwt.GenerateToken"
+
 	conf = config.New()
 
 	expirationTime := time.Now().Add(8760 * time.Hour) //One year
@@ -33,13 +35,15 @@ func GenerateJWT(userID int, email string) (string, error) {
 	tokenString, err := token.SignedString([]byte(conf.Jwt.Key))
 	if err != nil {
 
-		return "", err
+		return "", richerror.New(op).WithWrapError(err).WithKind(richerror.KindUnexpected).WithMessage(err.Error())
 	}
 
 	return tokenString, nil
 }
 
-func ValidateJWT(tokenString string) (bool, Claims, int, error) {
+func ValidateJWT(tokenString string) (bool, Claims, error) {
+	const op = "jwt.ValidateJWT"
+
 	conf = config.New()
 
 	claims := &Claims{}
@@ -50,17 +54,19 @@ func ValidateJWT(tokenString string) (bool, Claims, int, error) {
 	if err != nil {
 
 		if err == jwt.ErrSignatureInvalid {
-
-			return false, Claims{}, http.StatusUnauthorized, err
+			return false, Claims{}, richerror.New(op).WithWrapError(err).
+				WithMessage(err.Error()).WithKind(richerror.KindBadRequest)
 		}
 
-		return false, Claims{}, http.StatusBadRequest, err
+		return false, Claims{}, richerror.New(op).WithWrapError(err).
+			WithMessage(err.Error()).WithKind(richerror.KindUnauthorized)
+
 	}
 
 	if !tkn.Valid {
 
-		return false, Claims{}, http.StatusUnauthorized, fmt.Errorf("token is not valid")
+		return false, Claims{}, richerror.New(op).WithMessage(errmsg.ErrorMsgTokenNotValid).WithKind(richerror.KindBadRequest)
 	}
 
-	return true, *claims, 0, nil
+	return true, *claims, nil
 }

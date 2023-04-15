@@ -3,6 +3,8 @@ package service
 import (
 	"fmt"
 	"love-date/entity"
+	"love-date/pkg/errhandling/errmsg"
+	"love-date/pkg/errhandling/richerror"
 	"regexp"
 )
 
@@ -34,29 +36,34 @@ type UserCreateResponse struct {
 }
 
 func (u UserService) Create(req UserCreateRequest) (UserCreateResponse, error) {
+	const op = "user-service.Create"
 
 	emailRegex := regexp.MustCompile(`^[a-z0-9._%+\-]+@[a-z0-9.\-]+\.[a-z]{2,4}$`)
 
 	if len(req.Email) == 0 || !emailRegex.Match([]byte(req.Email)) {
 
-		return UserCreateResponse{}, fmt.Errorf("the email address is not valid format")
+		return UserCreateResponse{}, richerror.New(op).WithMessage(errmsg.ErrorMsgInvalidEmailFormat).
+			WithKind(richerror.KindBadRequest).WithMeta(map[string]interface{}{
+			"email": req.Email,
+		})
 	}
 
 	userExist, _, err := u.repo.DoesThisUserEmailExist(req.Email)
 	if err != nil {
 
-		return UserCreateResponse{}, fmt.Errorf("unexpected error: %w", err)
+		return UserCreateResponse{}, richerror.New(op).WithWrapError(err)
 	}
 	if userExist {
 
-		return UserCreateResponse{}, fmt.Errorf("the email has been registered before")
+		return UserCreateResponse{}, richerror.New(op).WithMessage(errmsg.ErrorMsgRegisteredBefore).
+			WithKind(richerror.KindBadRequest)
 	}
 
 	if createdUser, cErr := u.repo.CreateUser(entity.User{
 		Email: req.Email,
 	}); cErr != nil {
 
-		return UserCreateResponse{}, fmt.Errorf("unexpected error: %w", cErr)
+		return UserCreateResponse{}, richerror.New(op).WithWrapError(cErr)
 	} else {
 
 		return UserCreateResponse{createdUser}, nil
@@ -73,15 +80,17 @@ type AppendPartnerNameResponse struct {
 }
 
 func (u UserService) AppendNames(req AppendPartnerNameRequest) (AppendPartnerNameResponse, error) {
+	const op = "user-service.AppendNames"
+
 	profileResult, err := u.profileService.GetUserProfile(GetProfileRequest{req.AuthenticatedUserID})
 	if err != nil {
-		return AppendPartnerNameResponse{}, fmt.Errorf("can't get profile : %w", err)
+		return AppendPartnerNameResponse{}, richerror.New(op).WithWrapError(err)
 	}
 
 	partnerResult, err := u.partnerService.GetUserActivePartner(GetUserActivePartnerRequest{req.AuthenticatedUserID})
 	if err != nil {
 
-		return AppendPartnerNameResponse{}, fmt.Errorf("can't get partner : %w", err)
+		return AppendPartnerNameResponse{}, richerror.New(op).WithWrapError(err)
 	}
 
 	appendName := fmt.Sprintf("%s %s", profileResult.Profile.Name, partnerResult.Partner.Name)

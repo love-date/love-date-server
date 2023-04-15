@@ -27,7 +27,8 @@ func (p PartnerHandler) CreateNewPartner(w http.ResponseWriter, r *http.Request)
 
 		dErr := DecodeJSON(r.Body, createPartnerRequest)
 		if dErr != nil {
-			response.Fail(dErr.Error(), http.StatusBadRequest).ToJSON(w)
+			msg, code := httpmapper.Error(dErr)
+			response.Fail(msg, code).ToJSON(w)
 
 			return
 		}
@@ -100,7 +101,8 @@ func (p PartnerHandler) UpdatePartner(w http.ResponseWriter, r *http.Request) {
 		updatePartnerRequest := &service.UpdatePartnerRequest{}
 		dErr := DecodeJSON(r.Body, updatePartnerRequest)
 		if dErr != nil {
-			response.Fail(dErr.Error(), http.StatusBadRequest).ToJSON(w)
+			msg, code := httpmapper.Error(dErr)
+			response.Fail(msg, code).ToJSON(w)
 
 			return
 		}

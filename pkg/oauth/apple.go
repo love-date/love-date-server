@@ -1,8 +1,8 @@
 package oauth
 
 import (
-	"fmt"
 	"github.com/GianOrtiz/apple-auth-go"
+	"love-date/pkg/errhandling/richerror"
 )
 
 type AppleUser struct {
@@ -10,10 +10,14 @@ type AppleUser struct {
 }
 
 func (g Provider) AppleValidateOauthJWT(token string) (email string, err error) {
+	const op = "apple.AppleValidateOauthJWT"
+
 	var appleUser = new(AppleUser)
 	user, err := apple.GetUserInfoFromIDToken(token)
 	if err != nil {
-		return "", fmt.Errorf("failed getting user info: %w", err)
+
+		return "", richerror.New(op).WithWrapError(err).WithMessage(err.Error()).
+			WithKind(richerror.KindUnexpected)
 	}
 	appleUser.Email = user.Email
 

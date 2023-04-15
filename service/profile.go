@@ -1,9 +1,9 @@
 package service
 
 import (
-	"fmt"
 	"love-date/entity"
-	"love-date/errorType"
+	"love-date/pkg/errhandling/errmsg"
+	"love-date/pkg/errhandling/richerror"
 )
 
 type ProfileServiceRepository interface {
@@ -31,19 +31,25 @@ type CreateProfileResponse struct {
 }
 
 func (p ProfileService) Create(req CreateProfileRequest) (CreateProfileResponse, error) {
+	const op = "profile-service.Create"
+
 	if len(req.Name) < 2 {
 
-		return CreateProfileResponse{}, fmt.Errorf("the name's len must be longer than 1")
+		return CreateProfileResponse{}, richerror.New(op).WithMessage("the name's len must be longer than 1").
+			WithKind(richerror.KindBadRequest).WithMeta(map[string]interface{}{
+			"name": req.Name,
+		})
 	}
 
 	profileExist, _, err := p.repo.DoesThisUserProfileExist(req.AuthenticatedUserID)
 	if err != nil {
 
-		return CreateProfileResponse{}, fmt.Errorf("unexpected error: %w", err)
+		return CreateProfileResponse{}, richerror.New(op).WithWrapError(err)
 	}
 	if profileExist {
 
-		return CreateProfileResponse{}, fmt.Errorf("user has been created profile before")
+		return CreateProfileResponse{}, richerror.New(op).WithMessage(errmsg.ErrorMsgHaseBeenProfile).
+			WithKind(richerror.KindForbidden)
 	}
 
 	if createdProfile, cErr := p.repo.CreateProfile(entity.Profile{
@@ -53,7 +59,7 @@ func (p ProfileService) Create(req CreateProfileRequest) (CreateProfileResponse,
 		SpecialDaysNotifyActive: req.SpecialDaysNotifyActive,
 	}); cErr != nil {
 
-		return CreateProfileResponse{}, fmt.Errorf("enexpected error : %w", cErr)
+		return CreateProfileResponse{}, richerror.New(op).WithWrapError(cErr)
 	} else {
 
 		return CreateProfileResponse{createdProfile}, nil
@@ -73,20 +79,26 @@ type UpdateProfileResponse struct {
 }
 
 func (p ProfileService) Update(req UpdateProfileRequest) (UpdateProfileResponse, error) {
+	const op = "profile-service"
+
 	profileExist, profile, err := p.repo.DoesThisUserProfileExist(req.AuthenticatedUserID)
 	if err != nil {
 
-		return UpdateProfileResponse{}, fmt.Errorf("unexpected error: %w", err)
+		return UpdateProfileResponse{}, richerror.New(op).WithWrapError(err)
 	}
 	if !profileExist {
 
-		return UpdateProfileResponse{}, errorType.NotExistData
+		return UpdateProfileResponse{}, richerror.New(op).WithMessage(errmsg.ErrorMsgProfileNotFound).
+			WithKind(richerror.KindNotFound)
 	}
 
 	if req.Name != nil {
 		if len(*req.Name) < 2 {
 
-			return UpdateProfileResponse{}, fmt.Errorf("the name's len must be longer than 1 char")
+			return UpdateProfileResponse{}, richerror.New(op).WithMessage("the name's len must be longer than 1").
+				WithKind(richerror.KindBadRequest).WithMeta(map[string]interface{}{
+				"name": req.Name,
+			})
 		}
 		profile.Name = *req.Name
 	}
@@ -103,7 +115,7 @@ func (p ProfileService) Update(req UpdateProfileRequest) (UpdateProfileResponse,
 		SpecialDaysNotifyActive: profile.SpecialDaysNotifyActive,
 	}); uErr != nil {
 
-		return UpdateProfileResponse{}, fmt.Errorf("unexpected error : %w", uErr)
+		return UpdateProfileResponse{}, richerror.New(op).WithWrapError(uErr)
 	} else {
 
 		return UpdateProfileResponse{updatedProfile}, nil
@@ -119,15 +131,17 @@ type GetProfileResponse struct {
 }
 
 func (p ProfileService) GetUserProfile(req GetProfileRequest) (GetProfileResponse, error) {
+	const op = "profile-service.GetUserProfile"
+
 	profileExist, profile, err := p.repo.DoesThisUserProfileExist(req.AuthenticatedUserID)
 	if err != nil {
 
-		return GetProfileResponse{}, fmt.Errorf("unexpected error: %w", err)
+		return GetProfileResponse{}, richerror.New(op).WithWrapError(err)
 	}
 	if !profileExist {
 
-		//return GetProfileResponse{}, fmt.Errorf("the profile not found")
-		return GetProfileResponse{}, errorType.NotExistData
+		return GetProfileResponse{}, richerror.New(op).WithMessage(errmsg.ErrorMsgProfileNotFound).
+			WithKind(richerror.KindNotFound)
 
 	}
 

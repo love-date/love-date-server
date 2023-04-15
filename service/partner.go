@@ -51,7 +51,7 @@ func (p PartnerService) Create(req CreatePartnerRequest) (CreatePartnerResponse,
 
 	if partnerExist {
 
-		return CreatePartnerResponse{}, richerror.New(op).WithMessage(errmsg.ErrorMsgHaveActivePartner).
+		return CreatePartnerResponse{}, richerror.New(op).WithMessage(errmsg.ErrorMsgHasActivePartner).
 			WithKind(richerror.KindForbidden)
 	}
 

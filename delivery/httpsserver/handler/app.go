@@ -3,6 +3,7 @@ package handler
 import (
 	"fmt"
 	"love-date/delivery/httpsserver/response"
+	"love-date/pkg/errhandling/httpmapper"
 	"love-date/pkg/specialday"
 	"net/http"
 )
@@ -20,7 +21,8 @@ func (p AppHandler) GetSpecialDays(w http.ResponseWriter, r *http.Request) {
 	case http.MethodGet:
 		specialDays, sErr := specialday.GetSpecialDays()
 		if sErr != nil {
-			response.Fail(sErr.Error(), http.StatusBadRequest).ToJSON(w)
+			msg, code := httpmapper.Error(sErr)
+			response.Fail(msg, code).ToJSON(w)
 
 			return
 		}

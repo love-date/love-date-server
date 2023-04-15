@@ -3,6 +3,7 @@ package middleware
 import (
 	"context"
 	"love-date/delivery/httpsserver/response"
+	"love-date/pkg/errhandling/httpmapper"
 	"love-date/pkg/jwttoken"
 	"net/http"
 	"strings"
@@ -18,9 +19,10 @@ func AuthMiddleware(next http.Handler) http.Handler {
 			return
 		} else {
 			tokenString := authHeader[1]
-			isValid, claims, httpError, jErr := jwttoken.ValidateJWT(tokenString)
+			isValid, claims, jErr := jwttoken.ValidateJWT(tokenString)
 			if !isValid {
-				response.Fail(jErr.Error(), httpError).ToJSON(w)
+				msg, code := httpmapper.Error(jErr)
+				response.Fail(msg, code).ToJSON(w)
 
 				return
 			}

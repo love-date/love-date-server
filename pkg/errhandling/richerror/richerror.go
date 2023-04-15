@@ -1,5 +1,7 @@
 package richerror
 
+import "fmt"
+
 type Kind uint
 
 const (
@@ -7,6 +9,7 @@ const (
 	KindNotFound
 	KindUnexpected
 	KindBadRequest
+	KindUnauthorized
 )
 
 type Op string
@@ -74,6 +77,7 @@ func (r RichError) Kind() Kind {
 }
 
 func (r RichError) Message() string {
+	fmt.Println(r.message)
 	if r.message != "" {
 
 		return r.message
