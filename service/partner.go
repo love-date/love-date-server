@@ -1,9 +1,9 @@
 package service
 
 import (
-	"fmt"
 	"love-date/entity"
-	"love-date/errorType"
+	"love-date/pkg/errhandling/errmsg"
+	"love-date/pkg/errhandling/richerror"
 	"time"
 )
 
@@ -33,19 +33,26 @@ type CreatePartnerResponse struct {
 }
 
 func (p PartnerService) Create(req CreatePartnerRequest) (CreatePartnerResponse, error) {
+	const op = "partner-service.Create"
+
 	if len(req.Name) < 2 {
 
-		return CreatePartnerResponse{}, fmt.Errorf("the name's len must be longer than 1")
+		return CreatePartnerResponse{}, richerror.New(op).WithMessage("the name's len must be longer than 1").
+			WithKind(richerror.KindBadRequest).WithMeta(map[string]interface{}{
+			"name": req.Name,
+		})
 	}
 
 	partnerExist, _, err := p.repo.DoesUserHaveActivePartner(req.AuthenticatedUserID)
 	if err != nil {
 
-		return CreatePartnerResponse{}, fmt.Errorf("unexpected error : %w", err)
+		return CreatePartnerResponse{}, richerror.New(op).WithWrapError(err)
 	}
+
 	if partnerExist {
 
-		return CreatePartnerResponse{}, fmt.Errorf("this user has active partner")
+		return CreatePartnerResponse{}, richerror.New(op).WithMessage("this user has active partner").
+			WithKind(richerror.KindForbidden)
 	}
 
 	if createdPartner, cErr := p.repo.CreatePartner(entity.Partner{
@@ -55,7 +62,7 @@ func (p PartnerService) Create(req CreatePartnerRequest) (CreatePartnerResponse,
 		FirstDate: req.FirstDate,
 	}); cErr != nil {
 
-		return CreatePartnerResponse{}, fmt.Errorf("unexpected error : %w", err)
+		return CreatePartnerResponse{}, richerror.New(op).WithWrapError(cErr)
 	} else {
 
 		return CreatePartnerResponse{createdPartner}, nil
@@ -74,21 +81,28 @@ type UpdatePartnerResponse struct {
 }
 
 func (p PartnerService) Update(req UpdatePartnerRequest) (UpdatePartnerResponse, error) {
+	const op = "partner-service.Update"
+
 	partnerExist, partner, err := p.repo.DoesUserHaveActivePartner(req.AuthenticatedUserID)
 	if err != nil {
 
-		return UpdatePartnerResponse{}, fmt.Errorf("unexpected error : %w", err)
+		return UpdatePartnerResponse{}, richerror.New(op).WithWrapError(err)
 	}
 	if !partnerExist {
 
-		return UpdatePartnerResponse{}, errorType.NotExistData
+		return UpdatePartnerResponse{}, richerror.New(op).WithMessage(errmsg.ErrorMsgNotFound).
+			WithKind(richerror.KindNotFound)
 	}
 
 	if req.Name != nil {
 		if len(*req.Name) < 2 {
 
-			return UpdatePartnerResponse{}, fmt.Errorf("the name's len must be longer than 1 char")
+			return UpdatePartnerResponse{}, richerror.New(op).WithMessage("the name's len must be longer than 1 char").
+				WithKind(richerror.KindBadRequest).WithMeta(map[string]interface{}{
+				"name": req.Name,
+			})
 		}
+
 		partner.Name = *req.Name
 	}
 	if req.FirstDate != nil {
@@ -104,7 +118,7 @@ func (p PartnerService) Update(req UpdatePartnerRequest) (UpdatePartnerResponse,
 		FirstDate: partner.FirstDate,
 	}); uErr != nil {
 
-		return UpdatePartnerResponse{}, fmt.Errorf("unexpected error : %w", uErr)
+		return UpdatePartnerResponse{}, richerror.New(op).WithWrapError(uErr)
 	} else {
 
 		return UpdatePartnerResponse{updatedPartner}, nil
@@ -121,21 +135,24 @@ type RemovePartnerResponse struct {
 }
 
 func (p PartnerService) Remove(req RemovePartnerRequest) (bool, error) {
+	const op = "partner-service.Remove"
+
 	partnerExist, partner, err := p.repo.DoesUserHaveActivePartner(req.AuthenticatedUserID)
 	if err != nil {
 
-		return false, fmt.Errorf("unexpected error : %w", err)
+		return false, richerror.New(op).WithWrapError(err)
 	}
 	if !partnerExist {
 
-		return false, errorType.NotExistData
+		return false, richerror.New(op).WithMessage(errmsg.ErrorMsgNotFound).
+			WithKind(richerror.KindNotFound)
 	}
 
 	partner.Delete()
 
 	if _, uErr := p.repo.UpdatePartner(partner.ID, partner); uErr != nil {
 
-		return false, fmt.Errorf("unexpected error : %w", uErr)
+		return false, richerror.New(op).WithWrapError(uErr)
 	} else {
 
 		return true, nil
@@ -152,18 +169,19 @@ type GetUserActivePartnerResponse struct {
 }
 
 func (p PartnerService) GetUserActivePartner(req GetUserActivePartnerRequest) (GetUserActivePartnerResponse, error) {
+	const op = "partner-service.GetUserActivePartner"
+
 	partnerExist, partner, err := p.repo.DoesUserHaveActivePartner(req.AuthenticatedUserID)
 	if err != nil {
 
-		return GetUserActivePartnerResponse{}, fmt.Errorf("unexpected error : %w", err)
+		return GetUserActivePartnerResponse{}, richerror.New(op).WithWrapError(err)
 	}
-	if !partnerExist {
-		return GetUserActivePartnerResponse{}, errorType.NotExistData
 
-		//return GetUserActivePartnerResponse{}, fmt.Errorf("this user has't any active partner")
+	if !partnerExist {
+
+		return GetUserActivePartnerResponse{}, richerror.New(op).WithMessage(errmsg.ErrorMsgNotFound).
+			WithKind(richerror.KindNotFound)
 	}
 
 	return GetUserActivePartnerResponse{partner}, err
 }
-
-// CalculateTimeHasBeenTogether TODO: List of how time has been together

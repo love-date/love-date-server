@@ -1,10 +1,9 @@
 package handler
 
 import (
-	"errors"
 	"fmt"
 	"love-date/delivery/httpsserver/response"
-	"love-date/errorType"
+	"love-date/pkg/errhandling/httpmapper"
 	"love-date/service"
 	"net/http"
 )
@@ -38,7 +37,8 @@ func (p PartnerHandler) CreateNewPartner(w http.ResponseWriter, r *http.Request)
 
 		newPartner, cErr := p.service.Create(*createPartnerRequest)
 		if cErr != nil {
-			response.Fail(cErr.Error(), http.StatusBadRequest).ToJSON(w)
+			msg, code := httpmapper.Error(cErr)
+			response.Fail(msg, code).ToJSON(w)
 
 			return
 		}
@@ -61,13 +61,8 @@ func (p PartnerHandler) GetUserPartner(w http.ResponseWriter, r *http.Request) {
 		partner, cErr := p.service.GetUserActivePartner(*getPartnerRequest)
 		if cErr != nil {
 
-			if cErr == errorType.NotExistData || errors.Unwrap(cErr) == errorType.NotExistData {
-				response.Fail(cErr.Error(), http.StatusNoContent).ToJSON(w)
-
-				return
-			}
-
-			response.Fail(cErr.Error(), http.StatusBadRequest).ToJSON(w)
+			msg, code := httpmapper.Error(cErr)
+			response.Fail(msg, code).ToJSON(w)
 
 			return
 		}
@@ -83,19 +78,15 @@ func (p PartnerHandler) DeleteActivePartner(w http.ResponseWriter, r *http.Reque
 	switch r.Method {
 	case http.MethodDelete:
 		userID := r.Context().Value("user_id").(int)
-		success, err := p.service.Remove(service.RemovePartnerRequest{AuthenticatedUserID: userID})
+		_, err := p.service.Remove(service.RemovePartnerRequest{AuthenticatedUserID: userID})
 		if err != nil {
-			response.Fail(err.Error(), http.StatusBadRequest).ToJSON(w)
+			msg, code := httpmapper.Error(err)
+			response.Fail(msg, code).ToJSON(w)
 
 			return
 		}
-		if success {
-			response.OK("partner is deleted", nil).ToJSON(w)
 
-			return
-		} else {
-			response.Fail(err.Error(), http.StatusBadRequest).ToJSON(w)
-		}
+		response.OK("partner is deleted", nil).ToJSON(w)
 
 	default:
 		response.Fail(fmt.Sprintf("this method | %s | isn`t found at this path", r.Method), http.StatusNotFound).ToJSON(w)
@@ -119,7 +110,8 @@ func (p PartnerHandler) UpdatePartner(w http.ResponseWriter, r *http.Request) {
 
 		updatedPartner, err := p.service.Update(*updatePartnerRequest)
 		if err != nil {
-			response.Fail(err.Error(), http.StatusBadRequest).ToJSON(w)
+			msg, code := httpmapper.Error(err)
+			response.Fail(msg, code).ToJSON(w)
 
 			return
 		}
