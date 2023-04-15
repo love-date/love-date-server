@@ -14,16 +14,15 @@ func Error(err error) (msg string, code int) {
 		msg = re.Message()
 
 		code = mapKindToHTTPStatusCode(re.Kind())
+		if code >= 500 {
+			msg = errmsg.ErrorMsgSomethingWrong
+		}
+
+		return msg, code
 	default:
-		code = 500
+
+		return err.Error(), http.StatusBadRequest
 	}
-
-	if code >= 500 {
-		msg = errmsg.ErrorMsgSomethingWrong
-	}
-
-	return msg, code
-
 }
 
 func mapKindToHTTPStatusCode(kind richerror.Kind) int {

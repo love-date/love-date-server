@@ -51,7 +51,7 @@ func (p PartnerService) Create(req CreatePartnerRequest) (CreatePartnerResponse,
 
 	if partnerExist {
 
-		return CreatePartnerResponse{}, richerror.New(op).WithMessage("this user has active partner").
+		return CreatePartnerResponse{}, richerror.New(op).WithMessage(errmsg.ErrorMsgHaveActivePartner).
 			WithKind(richerror.KindForbidden)
 	}
 
@@ -90,7 +90,7 @@ func (p PartnerService) Update(req UpdatePartnerRequest) (UpdatePartnerResponse,
 	}
 	if !partnerExist {
 
-		return UpdatePartnerResponse{}, richerror.New(op).WithMessage(errmsg.ErrorMsgNotFound).
+		return UpdatePartnerResponse{}, richerror.New(op).WithMessage(errmsg.ErrorMsgPartnerNotFound).
 			WithKind(richerror.KindNotFound)
 	}
 
@@ -144,7 +144,7 @@ func (p PartnerService) Remove(req RemovePartnerRequest) (bool, error) {
 	}
 	if !partnerExist {
 
-		return false, richerror.New(op).WithMessage(errmsg.ErrorMsgNotFound).
+		return false, richerror.New(op).WithMessage(errmsg.ErrorMsgPartnerNotFound).
 			WithKind(richerror.KindNotFound)
 	}
 
@@ -179,7 +179,7 @@ func (p PartnerService) GetUserActivePartner(req GetUserActivePartnerRequest) (G
 
 	if !partnerExist {
 
-		return GetUserActivePartnerResponse{}, richerror.New(op).WithMessage(errmsg.ErrorMsgNotFound).
+		return GetUserActivePartnerResponse{}, richerror.New(op).WithMessage(errmsg.ErrorMsgPartnerNotFound).
 			WithKind(richerror.KindNotFound)
 	}
 
