@@ -1,12 +1,14 @@
 package httpmapper
 
 import (
+	"fmt"
 	"love-date/pkg/errhandling/errmsg"
 	"love-date/pkg/errhandling/richerror"
 	"net/http"
 )
 
 func Error(err error) (msg string, code int) {
+	fmt.Print("err", err)
 	switch err.(type) {
 	case richerror.RichError:
 		re := err.(richerror.RichError)
