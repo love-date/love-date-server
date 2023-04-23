@@ -19,7 +19,6 @@ func NewAuthHandler(authService service.AuthService) AuthHandler {
 }
 
 func (a AuthHandler) ValidateOauthToken(w http.ResponseWriter, r *http.Request) {
-	fmt.Println("start validate token")
 	switch r.Method {
 	case http.MethodPost:
 		validateTokenRequest := &service.ValidateTokenRequest{}
@@ -31,7 +30,6 @@ func (a AuthHandler) ValidateOauthToken(w http.ResponseWriter, r *http.Request) 
 
 			return
 		}
-		fmt.Println("validateTokenRequest: ", validateTokenRequest)
 
 		validateTokenResponse, aErr := a.authService.RegisterOrLogin(*validateTokenRequest)
 		if aErr != nil {
@@ -40,7 +38,6 @@ func (a AuthHandler) ValidateOauthToken(w http.ResponseWriter, r *http.Request) 
 
 			return
 		}
-		fmt.Println("validateTokenResponse ", validateTokenResponse)
 
 		token, jErr := jwttoken.GenerateJWT(validateTokenResponse.User.ID, validateTokenResponse.User.Email)
 		if jErr != nil {
@@ -49,7 +46,6 @@ func (a AuthHandler) ValidateOauthToken(w http.ResponseWriter, r *http.Request) 
 
 			return
 		}
-		fmt.Println("token", token)
 
 		response.OK("token loaded", token).ToJSON(w)
 
