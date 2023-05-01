@@ -8,7 +8,6 @@ import (
 )
 
 func Error(err error) (msg string, code int) {
-	fmt.Print("err", err)
 	switch err.(type) {
 	case richerror.RichError:
 		re := err.(richerror.RichError)
@@ -16,6 +15,11 @@ func Error(err error) (msg string, code int) {
 		msg = re.Message()
 
 		code = mapKindToHTTPStatusCode(re.Kind())
+
+		fmt.Println("err message", msg)
+		fmt.Println("err kind", code)
+		fmt.Println()
+
 		if code >= 500 {
 			msg = errmsg.ErrorMsgSomethingWrong
 		}
