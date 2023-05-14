@@ -141,7 +141,7 @@ func (p ProfileService) GetUserProfile(req GetProfileRequest) (GetProfileRespons
 	if !profileExist {
 
 		return GetProfileResponse{}, richerror.New(op).WithMessage(errmsg.ErrorMsgProfileNotFound).
-			WithKind(richerror.KindNotFound)
+			WithKind(richerror.KindNoContent)
 
 	}
 

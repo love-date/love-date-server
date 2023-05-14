@@ -1,7 +1,6 @@
 package errmsg
 
 const (
-	ErrorMsgNotFound        = "record not found"
 	ErrorMsgSomethingWrong  = "something is wrong"
 	ErrorMsgPartnerNotFound = "partner not found"
 	ErrorMsgProfileNotFound = "profile not found"

@@ -8,6 +8,7 @@ const (
 	KindUnexpected
 	KindBadRequest
 	KindUnauthorized
+	KindNoContent
 )
 
 type Op string

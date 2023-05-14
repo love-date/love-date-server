@@ -180,7 +180,7 @@ func (p PartnerService) GetUserActivePartner(req GetUserActivePartnerRequest) (G
 	if !partnerExist {
 
 		return GetUserActivePartnerResponse{}, richerror.New(op).WithMessage(errmsg.ErrorMsgPartnerNotFound).
-			WithKind(richerror.KindNotFound)
+			WithKind(richerror.KindNoContent)
 	}
 
 	return GetUserActivePartnerResponse{partner}, err
